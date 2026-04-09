@@ -4,6 +4,8 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.Edm;
 using Domain;
 using Microsoft.AspNetCore.OData;
+using Application.Actividades.Consultas;
+using Application.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,8 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 });
 
 builder.Services.AddCors();
+builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<ListarActividades.Handler>());
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
