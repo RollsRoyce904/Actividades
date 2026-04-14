@@ -32,6 +32,21 @@ function App() {
     setEditMode(false);
   }
 
+  const handleSubmitForm = (actividad: Actividad) => {
+    if(actividad.id) {
+      setActividades(actividades.map(a => a.id === actividad.id ? actividad : a));
+    } else {
+      setSelectedActividad(actividad);
+      setActividades([...actividades, {...actividad, id: actividades.length.toString()}]);
+    }
+    setEditMode(false);
+    
+  }
+
+  const handleDeleteActividad = (id: string) => {
+    setActividades(actividades.filter(a => a.id !== id));
+  }
+
   return (
    <>
     <Box sx={{ bgcolor: '#eeeeee' }}>
@@ -39,12 +54,14 @@ function App() {
     <NavBar openForm={handleOpenForm} />
     <Container maxWidth="xl" sx={{ mt: 3 }}>
       <PanelActividad actividades={actividades} 
-      selectActividad={handleSeclectActividad}
-      cancelSelectActividad={handleCancelActividad} 
-      selectedActividad={selectedActividad}
-      editMode={editMode}
-      openForm={handleOpenForm}
-      closeForm={handleFormClose}
+        selectActividad={handleSeclectActividad}
+        cancelSelectActividad={handleCancelActividad} 
+        selectedActividad={selectedActividad}
+        editMode={editMode}
+        openForm={handleOpenForm}
+        closeForm={handleFormClose}
+        submitForm={handleSubmitForm}
+        deleteActividad={handleDeleteActividad}
       />
     </Container>  
     </Box> 
