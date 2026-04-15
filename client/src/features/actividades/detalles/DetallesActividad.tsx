@@ -1,15 +1,12 @@
 import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
+import { Link, useParams } from "react-router";
 import { useActividades } from "../../../lib/hooks/useActividades";
 
-type Props = {
-    selectedActividad: Actividad;
-    cancelSelectActividad: () => void;
-    openForm: (id: string) => void;
-}
-export default function DetallesActividad({ selectedActividad, cancelSelectActividad, openForm }: Props) {
-    const { actividades } = useActividades();
-    const actividad = actividades?.find(a => a.id === selectedActividad.id);
+export default function DetallesActividad() {
+    const {id} = useParams();
+    const {actividad, isLoadingActividad} = useActividades(id);
 
+    if(isLoadingActividad) return <Typography variant="h5">Cargando...</Typography>
     if(!actividad) return <Typography variant="h5" color="error">Actividad no encontrada</Typography>
 
   return (
@@ -21,8 +18,8 @@ export default function DetallesActividad({ selectedActividad, cancelSelectActiv
             <Typography variant="body1">{actividad.descripcion}</Typography>
         </CardContent>
         <CardActions>
-            <Button color="primary" onClick={() => openForm(actividad.id)}>Editar</Button>
-            <Button onClick={cancelSelectActividad} color="inherit">Cancelar</Button>
+            <Button component={Link} to={`/editarActividad/${actividad.id}`} color="primary">Editar</Button>
+            <Button component={Link} to="/actividades" color="inherit">Cancelar</Button>
         </CardActions>
     </Card>
   )

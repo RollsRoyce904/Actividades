@@ -1,14 +1,12 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
 import { useActividades } from "../../../lib/hooks/useActividades";
+import { useNavigate, useParams } from "react-router";
 
+export default function FormularioActividad() {
+    const { id } = useParams();
+    const { updateActividad, createActividad, actividad, isLoadingActividad } = useActividades(id);
 
-type Props = {
-    actividad?: Actividad;
-    closeForm: () => void;
-}
-
-export default function FormularioActividad({ actividad, closeForm }: Props) {
-    const { updateActividad, createActividad } = useActividades();
+    const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -22,12 +20,18 @@ export default function FormularioActividad({ actividad, closeForm }: Props) {
         if (actividad) {
             data.id = actividad.id;
             await updateActividad.mutateAsync(data as unknown as Actividad);
-            closeForm();
+            navigate(`/actividades/${actividad.id}`);
         } else {
-            await createActividad.mutateAsync(data as unknown as Actividad);
-            closeForm();
+            createActividad.mutate(data as unknown as Actividad, {
+                onSuccess: (id) => {
+                    navigate(`/actividades/${id}`)
+                }
+            });
         }
     }
+
+    if (isLoadingActividad) return <Typography variant="h5">Cargando...</Typography>
+
     return (
         <Paper sx={{ borderRadius: 3, padding: 3 }}>
             <Typography variant="h5" gutterBottom color="primary">{actividad ? 'Editar actividad' : 'Crear actividad'}</Typography>
@@ -41,7 +45,7 @@ export default function FormularioActividad({ actividad, closeForm }: Props) {
                 <TextField name="Ciudad" label="Ciudad" defaultValue={actividad?.ciudad} />
                 <TextField name="Lugar" label="Lugar" defaultValue={actividad?.lugar} />
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 3 }}>
-                    <Button color='inherit' onClick={closeForm}>Cancelar</Button>
+                    <Button color='inherit' onClick={() => {}}>Cancelar</Button>
                     <Button
                         color='success'
                         variant="contained"
