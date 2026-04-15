@@ -1,6 +1,6 @@
-using System;
+using Application.Actividades.DTO;
+using Application.Core;
 using AutoMapper;
-using Domain;
 using MediatR;
 using Persistence;
 
@@ -8,21 +8,26 @@ namespace Application.Actividades.Comandos;
 
 public class EditarActividad
 {
-    public class Command : IRequest
+    public class Command : IRequest<Resultado<Unit>>
     {
-        public required Actividad Actividad { get; set; }
+        public required EditarActividadDTO ActividadDto { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Command>
+    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Command, Resultado<Unit>>
     {
-        public async Task Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Resultado<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var actividad = await context.Actividades.FindAsync([request.Actividad.Id], cancellationToken)
-                ?? throw new Exception("Actividad no encontrada!");
+            var actividad = await context.Actividades.FindAsync([request.ActividadDto.Id], cancellationToken);
 
-            mapper.Map(request.Actividad, actividad);
+            if (actividad == null) return Resultado<Unit>.Fallido("Actividad no encontrada!", 404);
 
-            await context.SaveChangesAsync(cancellationToken);
+            mapper.Map(request.ActividadDto, actividad);
+
+            var resultado = await context.SaveChangesAsync(cancellationToken) > 0;
+
+            if (!resultado) return Resultado<Unit>.Fallido("Error al actualizar la actividad!", 500);
+
+            return Resultado<Unit>.Exitoso(Unit.Value);
         }
     }
 }

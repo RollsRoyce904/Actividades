@@ -2,25 +2,32 @@ using System;
 using Domain;
 using MediatR;
 using Persistence;
+using Application.Actividades.DTO;
+using AutoMapper;
+using FluentValidation;
+using Application.Core;
 
 namespace Application.Actividades.Comandos;
 
 public class CrearActividad
 {
-    public class Command : IRequest<string>
+    public class Command : IRequest<Resultado<string>>
     {
-        public required Actividad Actividad { get; set; }
+        public required CrearActividadDTO ActividadDto { get; set; }
     }
 
-    public class Handler(AppDbContext context) : IRequestHandler<Command, string>
+    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Command, Resultado<string>>
     {
-        public async Task<string> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Resultado<string>> Handle(Command request, CancellationToken cancellationToken)
         {
-            context.Actividades.Add(request.Actividad);
+            var actividad = mapper.Map<Actividad>(request.ActividadDto);
+            context.Actividades.Add(actividad);
 
-            await context.SaveChangesAsync(cancellationToken);
+            var resultado = await context.SaveChangesAsync(cancellationToken) > 0;
 
-            return request.Actividad.Id;
+            if (!resultado) return Resultado<string>.Fallido("Error al crear la actividad!", 500);
+
+            return Resultado<string>.Exitoso(actividad.Id);
         }
     }
 }

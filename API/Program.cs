@@ -6,10 +6,11 @@ using Domain;
 using Microsoft.AspNetCore.OData;
 using Application.Actividades.Consultas;
 using Application.Core;
+using FluentValidation;
+using Application.Actividades.Validadores;
+using API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 // Add services to the container.
 builder.Services.AddControllers()
@@ -29,8 +30,16 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 });
 
 builder.Services.AddCors();
-builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<ListarActividades.Handler>());
+
+builder.Services.AddMediatR(x =>
+{
+    x.RegisterServicesFromAssemblyContaining<ListarActividades.Handler>();
+    x.AddOpenBehavior(typeof(ValidacionConducta<,>));
+});
+
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddValidatorsFromAssemblyContaining<CrearActividadValidador>();
+builder.Services.AddTransient<ExceptionMiddleware>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
@@ -38,6 +47,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins
 ("http://localhost:3000", "https://localhost:3000"));
 // if (app.Environment.IsDevelopment())
@@ -67,8 +77,6 @@ catch (Exception ex)
 }
 
 app.Run();
-
-
 
 static IEdmModel GetEdmModel()
 {

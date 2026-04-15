@@ -1,9 +1,9 @@
 using Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using MediatR;
 using Application.Actividades.Consultas;
 using Application.Actividades.Comandos;
+using Application.Actividades.DTO;
 
 namespace API.Controllers
 {
@@ -22,29 +22,25 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Actividad>> GetActividades(string id)
         {
-            return await Mediator.Send(new DetallesActividades.Query{Id = id});
+            return HandleResultado(await Mediator.Send(new DetallesActividades.Query{Id = id}));
         }
 
         [HttpPost]
-        public async Task<ActionResult<string>> CrearActividades(Actividad actividad)
+        public async Task<ActionResult<string>> CrearActividades(CrearActividadDTO actividadDto)
         {
-            return await Mediator.Send(new CrearActividad.Command{Actividad = actividad});
+            return HandleResultado(await Mediator.Send(new CrearActividad.Command{ActividadDto = actividadDto}));
         }
 
         [HttpPut]
-        public async Task<ActionResult> EditarActividad(Actividad actividad)
+        public async Task<ActionResult> EditarActividad(EditarActividadDTO actividadDto)
         {
-            await Mediator.Send(new EditarActividad.Command{Actividad = actividad});
-
-            return  NoContent();
+            return HandleResultado(await Mediator.Send(new EditarActividad.Command{ActividadDto = actividadDto}));
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> BorrarActividad(string id)
         {
-            await Mediator.Send(new BorrarActividad.Command{ Id = id});
-
-            return Ok();
+            return HandleResultado(await Mediator.Send(new BorrarActividad.Command{ Id = id}));
         }
     }
 }
