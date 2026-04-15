@@ -63,7 +63,7 @@ export default function DetallesActividadHeader({ actividad }: Props) {
                                 variant="contained"
                                 color="primary"
                                 component={Link}
-                                to={`/manage/activityId`}
+                                to={`/editarActividad/${actividad.id}`}
                                 disabled={isCancelled}
                             >
                                 Manage Event
