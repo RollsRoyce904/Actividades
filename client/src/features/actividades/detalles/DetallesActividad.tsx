@@ -1,6 +1,10 @@
-import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
-import { Link, useParams } from "react-router";
+import { Grid2, Typography } from "@mui/material";
+import { useParams } from "react-router";
 import { useActividades } from "../../../lib/hooks/useActividades";
+import DetallesActividadChat from "./DetallesActividadChat";
+import DetallesActividadHeader from "./DetallesActividadHeader";
+import DetallesActividadInfo from "./DetallesActividadInfo";
+import DetallesActividadSidebar from "./DetallesActividadSidebar";
 
 export default function DetallesActividad() {
     const {id} = useParams();
@@ -10,17 +14,15 @@ export default function DetallesActividad() {
     if(!actividad) return <Typography variant="h5" color="error">Actividad no encontrada</Typography>
 
   return (
-    <Card sx={{ borderRadius: 3 }}>
-        <CardMedia component="img" src={`/images/categoryImages/${actividad.categoria}.jpg`} alt={actividad.titulo} />
-        <CardContent>
-            <Typography variant="h5">{actividad.titulo}</Typography>
-            <Typography variant="subtitle1" fontWeight='light'>{actividad.date}</Typography>
-            <Typography variant="body1">{actividad.descripcion}</Typography>
-        </CardContent>
-        <CardActions>
-            <Button component={Link} to={`/editarActividad/${actividad.id}`} color="primary">Editar</Button>
-            <Button component={Link} to="/actividades" color="inherit">Cancelar</Button>
-        </CardActions>
-    </Card>
+    <Grid2 container spacing={3}>
+        <Grid2 size={8}>
+            <DetallesActividadHeader actividad={actividad} />
+            <DetallesActividadInfo actividad={actividad} />
+            <DetallesActividadChat />
+        </Grid2>
+        <Grid2 size={4}>
+            <DetallesActividadSidebar />            
+        </Grid2>
+    </Grid2>
   )
 }
