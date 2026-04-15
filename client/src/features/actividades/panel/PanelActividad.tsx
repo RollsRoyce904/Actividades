@@ -10,32 +10,28 @@ type Props = {
     selectedActividad: Actividad | undefined;
     openForm: (id?: string) => void;
     closeForm: () => void;
-    submitForm: (actividad: Actividad) => void;
-    deleteActividad: (id: string) => void;
     editMode: boolean;
 }
 
 export default function PanelActividad({ actividades, selectActividad, cancelSelectActividad, 
-  selectedActividad, openForm, closeForm, submitForm, deleteActividad, editMode }: Props) {
+  selectedActividad, openForm, closeForm, editMode }: Props) {
   return (
     <Grid2 container spacing={3}>
       <Grid2 size={7}>
         <ListaActividad 
           actividades={actividades} 
-          selectActividad={selectActividad}
-          deleteActividad={deleteActividad} />
+          selectActividad={selectActividad} />
       </Grid2>
       <Grid2 size={5}>
         {selectedActividad && !editMode && 
         <DetallesActividad 
-          actividad={selectedActividad} 
+          selectedActividad={selectedActividad} 
           cancelSelectActividad={cancelSelectActividad} 
           openForm={openForm} />}
         {editMode && 
         <FormularioActividad 
           actividad={selectedActividad} 
-          closeForm={closeForm}
-          submitForm={submitForm} />}
+          closeForm={closeForm} />}
       </Grid2>
     </Grid2>
   )
