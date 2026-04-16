@@ -1,14 +1,16 @@
 import { CalendarToday, Info, Place } from "@mui/icons-material";
-import { Divider, Grid2, Paper, Typography } from "@mui/material";
+import { Box, Button, Divider, Grid2, Paper, Typography } from "@mui/material";
+import { useState } from "react";
+import MapComponent from "../../../app/shared/components/MapComponent";
 
 type Props = {
     actividad: Actividad;
 }
 
 export default function DetallesActividadInfo({ actividad }: Props) {
-  return (
+    const [mapOpen, setMapOpen] = useState(false);
+    return (
         <Paper sx={{ mb: 2 }}>
-
             <Grid2 container alignItems="center" pl={2} py={1}>
                 <Grid2 size={1}>
                     <Info color="info" fontSize="large" />
@@ -32,12 +34,20 @@ export default function DetallesActividadInfo({ actividad }: Props) {
                 <Grid2 size={1}>
                     <Place color="info" fontSize="large" />
                 </Grid2>
-                <Grid2 size={11}>
+                <Grid2 size={11} display='flex' justifyContent='space-between' alignItems='center'>
                     <Typography>
                         {actividad.lugar}, {actividad.ciudad}
                     </Typography>
+                    <Button onClick={() => setMapOpen(!mapOpen)}>
+                        {mapOpen ? 'Ocultar mapa' : 'Mostrar mapa'}
+                    </Button>
                 </Grid2>
             </Grid2>
+            {mapOpen && (
+                <Box sx={{ height: 400, zIndex: 1000, display: 'block' }}>
+                    <MapComponent position={[actividad.latitud, actividad.longitud]} venue={actividad.lugar} />
+                </Box>
+            )}
         </Paper>
     )
 

@@ -42,7 +42,7 @@ export default function DetallesActividadHeader({ actividad }: Props) {
                 {/* Text Section */}
                 <Box>
                     <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{actividad.titulo}</Typography>
-                    <Typography variant="subtitle1">{actividad.date}</Typography>
+                    <Typography variant="subtitle1">{actividad.date.toString()}</Typography>
                     <Typography variant="subtitle2">
                         Hosted by <Link to={`/profiles/username`} style={{ color: 'white', fontWeight: 'bold' }}>Bob</Link>
                     </Typography>
