@@ -11,6 +11,47 @@ type Actividad = {
   longitud: number
 }
 
+type User = {
+    id: string
+    email: string
+    displayName: string
+    imageUrl?: string
+}
+
+type Profile = {
+    id: string
+    displayName: string
+    bio?: string
+    imageUrl?: string
+    followersCount?: number
+    followingCount?: number
+    following?: boolean
+}
+
+type Photo = {
+    id: string
+    url: string
+}
+
+type ChatComment = {
+    id: string;
+    createdAt: Date;
+    body: string;
+    userId: string;
+    displayName: string;
+    imageUrl?: string;
+}
+
+type PagedList<T, TCursor> = {
+  items: T[],
+  nextCursor: TCursor
+}
+
+type ResetPassword = {
+  email: string
+  resetCode: string
+  newPassword: string
+}
 
 type LocationIQSuggestion = {
     place_id: string

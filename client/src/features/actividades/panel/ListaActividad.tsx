@@ -3,8 +3,8 @@ import TarjetaActividad from "./TarjetaActividad";
 import { useActividades } from "../../../lib/hooks/useActividades";
 
 export default function ListaActividad() {
-    const {actividades, isPending} = useActividades();
-  if(!actividades || isPending) {
+    const {actividades, isLoading} = useActividades();
+  if(!actividades || isLoading  ) {
     return <Typography variant="h5" color="primary">Cargando actividades...</Typography>;
   }
   return (

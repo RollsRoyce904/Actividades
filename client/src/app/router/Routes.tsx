@@ -8,6 +8,8 @@ import Counter from "../../features/counter/Counter";
 import TestErrors from "../../features/errors/TestErrors";
 import NoEncontrada from "../../features/errors/NoEncontrada";
 import ServerError from "../../features/errors/ServerError";
+import LoginForm from "../../features/account/LoginForm";
+import RequireAuth from "./RequireAuth";
 
 export const router = createBrowserRouter([
     {
@@ -15,14 +17,21 @@ export const router = createBrowserRouter([
         element: <App />,
         children: [
             { path: '', element: <HomePage /> },
-            { path: 'actividades', element: <PanelActividad /> },
-            { path: 'actividades/:id', element: <DetallesActividad /> },
-            { path: 'crearActividad', element: <FormularioActividad key='crear' /> },
-            { path: 'editarActividad/:id', element: <FormularioActividad /> },
-            { path: 'counter', element: <Counter />},
+            
+            {
+                element: <RequireAuth />, children: [
+                    { path: 'actividades', element: <PanelActividad /> },
+                    { path: 'actividades/:id', element: <DetallesActividad /> },
+                    { path: 'crearActividad', element: <FormularioActividad key='crear' /> },
+                    { path: 'editarActividad/:id', element: <FormularioActividad /> },
+                ]
+            },
+            
+            { path: 'counter', element: <Counter /> },
             { path: 'test-errors', element: <TestErrors /> },
             { path: 'not-found', element: <NoEncontrada /> },
             { path: 'server-error', element: <ServerError /> },
+            { path: 'login', element: <LoginForm /> },
             { path: '*', element: <Navigate replace to='/not-found' /> }
         ]
     }
