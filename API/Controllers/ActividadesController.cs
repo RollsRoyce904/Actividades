@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.OData.Query;
 using Application.Actividades.Consultas;
 using Application.Actividades.Comandos;
 using Application.Actividades.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class ActividadesController : BaseApiController
     {
@@ -20,7 +20,7 @@ namespace API.Controllers
 
         [EnableQuery]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Actividad>> GetActividades(string id)
+        public async Task<ActionResult<Actividad>> GetActividadDetalle(string id)
         {
             return HandleResultado(await Mediator.Send(new DetallesActividades.Query{Id = id}));
         }

@@ -9,11 +9,18 @@ using Application.Core;
 using FluentValidation;
 using Application.Actividades.Validadores;
 using API.Middleware;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers()
+builder.Services.AddControllers(opt =>
+{
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    opt.Filters.Add(new AuthorizeFilter(policy));
+})
 .AddOData(opt => 
     opt.AddRouteComponents("odata", GetEdmModel())
     .Select()
@@ -40,6 +47,17 @@ builder.Services.AddMediatR(x =>
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<CrearActividadValidador>();
 builder.Services.AddTransient<ExceptionMiddleware>();
+builder.Services.AddIdentityApiEndpoints<User>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+    // opt.Password.RequireDigit = false;
+    // opt.Password.RequireLowercase = false;
+    // opt.Password.RequireNonAlphanumeric = false;
+    // opt.Password.RequireUppercase = false;
+    // opt.Password.RequiredLength = 6;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<AppDbContext>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
@@ -48,8 +66,9 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins
-("http://localhost:3000", "https://localhost:3000"));
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+.WithOrigins("http://localhost:3000", "https://localhost:3000"));
+
 // if (app.Environment.IsDevelopment())
 // {
 //     app.MapOpenApi();
@@ -57,18 +76,21 @@ app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins
 
 //app.UseHttpsRedirection();
 
-//app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 //Provides the routing for the controllers in the API
 app.MapControllers();
+app.MapGroup("api").MapIdentityApi<User>(); // api/login, api/register, etc.
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<AppDbContext>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
     await context.Database.MigrateAsync();
-    await DbInitializer.SeedData(context);
+    await DbInitializer.SeedData(context, userManager);
 }
 catch (Exception ex)
 {
