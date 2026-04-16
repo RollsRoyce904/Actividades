@@ -39,7 +39,6 @@ export default function FormularioActividad() {
     const onSubmit = async (data: SchemaActividad) => {
         const { locacion, ...rest } = data;
         const flattenedData = { ...rest, ...locacion };
-
         try {
             if (actividad) {
                 updateActividad.mutate({ ...actividad, ...flattenedData } as Actividad, {
@@ -82,15 +81,12 @@ export default function FormularioActividad() {
                         name="categoria" />
 
                     <DateTimeInput 
-                    label="Fecha" 
-                    name="date"
-                    control={control}/>
+                        label="Fecha" 
+                        name="date"
+                        control={control}/>
                 </Box>
 
-                <LocationInput 
-                    label="Locacion" 
-                    name="locacion"
-                    control={control}/>
+                <LocationInput control={control} label="Locacion" name="locacion" />
                 
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 3 }}>
                     <Button color='inherit' onClick={() => {navigate(-1)}}>Cancelar</Button>
@@ -98,7 +94,7 @@ export default function FormularioActividad() {
                         color='success'
                         variant="contained"
                         type="submit"
-                        disabled={updateActividad.isPending || createActividad.isPending}>Submit</Button>
+                        loading={updateActividad.isPending || createActividad.isPending}>Submit</Button>
                 </Box>
             </Box>
         </Paper>

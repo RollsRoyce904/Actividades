@@ -15,7 +15,7 @@ export default function LocationInput<T extends FieldValues>(props: Props<T>) {
 
     useEffect(() => {
         if (field.value && typeof field.value === 'object') {
-            setInputValue(field.value.venue || '');
+            setInputValue(field.value.lugar || '');
         } else {
             setInputValue(field.value || '');
         }
@@ -50,13 +50,12 @@ export default function LocationInput<T extends FieldValues>(props: Props<T>) {
     }
 
     const handleSelect = (location: LocationIQSuggestion) => {
-        const city = location.address?.city || location.address?.village || location.address?.town;
-        const venue = location.display_name;
-        const latitude = Number(location.lat);
-        const longitude = Number(location.lon);
-        console.log("selected: ", city, venue, latitude, longitude);
-        setInputValue(venue);
-        field.onChange({ city, venue, latitude, longitude });
+        const ciudad = location.address?.city || location.address?.village || location.address?.town;
+        const lugar = location.display_name;
+        const latitud = Number(location.lat);
+        const longitud = Number(location.lon);
+        setInputValue(lugar);
+        field.onChange({ ciudad, lugar, latitud, longitud });
         setSuggestions([]);
     }
 
@@ -78,8 +77,7 @@ export default function LocationInput<T extends FieldValues>(props: Props<T>) {
                         <ListItemButton
                             divider
                             key={suggestion.place_id}
-                            onClick={() => handleSelect(suggestion)}
-                        >
+                            onClick={() => handleSelect(suggestion)}>
                             {suggestion.display_name}
                         </ListItemButton>
                     ))}

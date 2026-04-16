@@ -10,7 +10,7 @@ export const schemaActividad = z.object({
     date: z.coerce.date({error: 'Fecha es requerida'}),
     locacion: z.object({
         lugar: requiredString('Lugar'),
-        ciudad: z.string().optional(),
+        ciudad: z.string(),
         latitud: z.coerce.number(),
         longitud: z.coerce.number()
     })
