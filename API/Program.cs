@@ -12,6 +12,8 @@ using API.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Application.Interfaces;
+using Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +45,7 @@ builder.Services.AddMediatR(x =>
     x.RegisterServicesFromAssemblyContaining<ListarActividades.Handler>();
     x.AddOpenBehavior(typeof(ValidacionConducta<,>));
 });
-
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<CrearActividadValidador>();
 builder.Services.AddTransient<ExceptionMiddleware>();

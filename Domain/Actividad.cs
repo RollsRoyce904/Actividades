@@ -16,4 +16,7 @@ public class Actividad
     public required string Lugar { get; set; }
     public double Latitud { get; set; }
     public double Longitud { get; set; }
+
+    //nav prop
+    public ICollection<ActividadAttendee> Attendees { get; set; } = [];
 }
