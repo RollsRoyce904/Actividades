@@ -9,10 +9,18 @@ namespace Infrastructure;
 
 public class UserAccessor(IHttpContextAccessor httpContextAccessor, AppDbContext dbContext) : IUserAccessor
 { 
-    public Task<User> GetUserAsync()
+    public async Task<User> GetUserAsync()
     {
-        return dbContext.Users.FirstOrDefaultAsync(x => x.Id == GetUserId())
-        ?? throw new UnauthorizedAccessException("No user is logged in");
+       var userId = GetUserId();
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new UnauthorizedAccessException("No user is logged in");
+        }
+
+        var user = await dbContext.Users.FindAsync(userId)
+                   ?? throw new UnauthorizedAccessException("Cannot find user in the DB");
+
+        return user;
     }
 
     public string GetUserId()
