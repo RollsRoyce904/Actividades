@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Application.Interfaces;
 using Infrastructure.Security;
-
+using Infrastructure.Photos;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -69,6 +69,7 @@ builder.Services.AddAuthorization(opt =>
     });
 });
 builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
