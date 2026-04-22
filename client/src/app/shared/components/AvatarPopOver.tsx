@@ -1,0 +1,54 @@
+import * as React from 'react';
+import Popover from '@mui/material/Popover';
+import { Avatar } from '@mui/material';
+import { Link } from 'react-router';
+import TarjetaPerfil from '../../../features/perfiles/TarjetaPerfil';
+
+type Props = {
+    profile: Profile;
+}
+
+export default function AvatartPopOver({ profile }: Props) {
+    const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+
+    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handlePopoverClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+
+    return (
+        <div>
+            <Avatar
+                src={profile.imageUrl}
+                alt={profile.displayName + ' image'}
+                component={Link}
+                to={`/profiles/${profile.id}`}
+                onMouseEnter={handlePopoverOpen}
+                onMouseLeave={handlePopoverClose}
+            />
+            <Popover
+                id="mouse-over-popover"
+                sx={{ pointerEvents: 'none' }}
+                open={open}
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
+                onClose={handlePopoverClose}
+                disableRestoreFocus
+            >
+                <TarjetaPerfil profile={profile} />
+            </Popover>
+        </div>
+    );
+}

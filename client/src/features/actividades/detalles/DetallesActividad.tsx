@@ -21,7 +21,7 @@ export default function DetallesActividad() {
             <DetallesActividadChat />
         </Grid2>
         <Grid2 size={4}>
-            <DetallesActividadSidebar />            
+            <DetallesActividadSidebar actividad={actividad}/>            
         </Grid2>
     </Grid2>
   )

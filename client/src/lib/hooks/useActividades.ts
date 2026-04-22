@@ -15,6 +15,15 @@ export const useActividades = (id?: string) => {
       return response.data;
     },
     enabled: !id && location.pathname === '/actividades' && !!currentUser,
+    select: (data) => {
+      return data.map(actividad => {
+        return {
+          ...actividad,
+          isGoing: actividad.attendees.some(a => a.id === currentUser?.id),
+          isHost: currentUser?.id === actividad.hostId
+        }
+      })
+    }
     //staleTime: 1000 * 60 * 5 // 5 minutos
   })
 
@@ -24,7 +33,14 @@ export const useActividades = (id?: string) => {
       const response = await agent.get<Actividad>(`/actividades/${id}`);
       return response.data;
     },
-    enabled: !!id && !!currentUser
+    enabled: !!id && !!currentUser,
+    select: (data) => {
+      return {
+        ...data,
+        isGoing: data.attendees.some(a => a.id === currentUser?.id),
+        isHost: currentUser?.id === data.hostId
+      }
+    }
   });
 
 
@@ -56,6 +72,41 @@ export const useActividades = (id?: string) => {
     }
   })
 
+  const updateAsistir = useMutation({
+    mutationFn: async (id: string) => {
+      await agent.post(`/actividades/${id}/asistir`);
+    },
+    onMutate: async (actividadId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['actividades', actividadId] });
+
+      const previousActividad = queryClient.getQueryData<Actividad>(['actividades', actividadId]);
+      queryClient.setQueryData<Actividad>(['actividades', actividadId], old => {
+        if (!old || !currentUser) return old;
+
+        const isGoing = old.attendees.some(a => a.id === currentUser?.id);
+        const isHost = currentUser.id === old.hostId;
+
+        return {
+          ...old,
+          isCancelado: isHost ? !old.isCancelado : old.isCancelado,
+          attendees: isGoing
+            ? isHost
+              ? old.attendees
+              : old.attendees.filter(a => a.id !== currentUser.id)
+            : [...old.attendees, { id: currentUser.id, displayName: currentUser.displayName, imageUrl: currentUser.imageUrl }]
+        }
+      })
+      return { previousActividad };
+    },
+    onError: (error, actividadId, context) => {
+      console.log('Error updating attendance', error);
+      if (context?.previousActividad) {
+        queryClient.setQueryData<Actividad>(['actividades', actividadId], context.previousActividad);
+      }
+    }
+  });
+
+
   return {
     actividades,
     isLoading,
@@ -63,6 +114,7 @@ export const useActividades = (id?: string) => {
     createActividad,
     deleteActividad,
     actividad,
-    isLoadingActividad
+    isLoadingActividad,
+    updateAsistir
   };
 }

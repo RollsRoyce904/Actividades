@@ -1,23 +1,22 @@
-import { Card, Badge, CardMedia, Box, Typography, Button } from "@mui/material";
+import { Card, CardMedia, Box, Typography, Chip } from "@mui/material";
 import { Link } from "react-router";
+import { useActividades } from "../../../lib/hooks/useActividades";
+import StyledButton from "../../../app/shared/components/StyledButton";
 
 type Props = {
     actividad: Actividad;
 }
 
 export default function DetallesActividadHeader({ actividad }: Props) {
-    const isCancelled = false;
-    const isHost = true;
-    const isGoing = true;
-    const loading = false;
+    const { updateAsistir } = useActividades(actividad.id);
 
     return (
         <Card sx={{ position: 'relative', mb: 2, backgroundColor: 'transparent', overflow: 'hidden' }}>
-            {isCancelled && (
-                <Badge
+            {actividad.isCancelado && (
+                <Chip
                     sx={{ position: 'absolute', left: 40, top: 20, zIndex: 1000 }}
                     color="error"
-                    badgeContent="Cancelled"
+                    label="Cancelada"
                 />
             )}
             <CardMedia
@@ -44,40 +43,41 @@ export default function DetallesActividadHeader({ actividad }: Props) {
                     <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{actividad.titulo}</Typography>
                     <Typography variant="subtitle1">{actividad.date.toString()}</Typography>
                     <Typography variant="subtitle2">
-                        Hosted by <Link to={`/profiles/username`} style={{ color: 'white', fontWeight: 'bold' }}>Bob</Link>
+                        Hosted by <Link to={`/profiles/${actividad.hostId}`} style={{ color: 'white', fontWeight: 'bold' }}>{actividad.hostDisplayName}</Link>
                     </Typography>
                 </Box>
 
                 {/* Buttons aligned to the right */}
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                    {isHost ? (
+                    {actividad.isHost ? (
                         <>
-                            <Button
+                            <StyledButton
                                 variant='contained'
-                                color={isCancelled ? 'success' : 'error'}
-                                onClick={() => { }}
+                                color={actividad.isCancelado ? 'success' : 'error'}
+                                onClick={() => {updateAsistir.mutate(actividad.id)}}
+                                disabled={updateAsistir.isPending}
                             >
-                                {isCancelled ? 'Re-activate Activity' : 'Cancel Activity'}
-                            </Button>
-                            <Button
+                                {actividad.isCancelado ? 'Re-activar Actividad' : 'Cancelar Actividad'}
+                            </StyledButton>
+                            <StyledButton
                                 variant="contained"
                                 color="primary"
                                 component={Link}
                                 to={`/editarActividad/${actividad.id}`}
-                                disabled={isCancelled}
+                                disabled={actividad.isCancelado}
                             >
-                                Manage Event
-                            </Button>
+                                Gestionar Evento
+                            </StyledButton>
                         </>
                     ) : (
-                        <Button
+                        <StyledButton
                             variant="contained"
-                            color={isGoing ? 'primary' : 'info'}
-                            onClick={() => { }}
-                            disabled={isCancelled || loading}
+                            color={actividad.isGoing ? 'primary' : 'info'}
+                            onClick={() => updateAsistir.mutate(actividad.id)}
+                            disabled={updateAsistir.isPending || actividad.isCancelado}
                         >
-                            {isGoing ? 'Cancel Attendance' : 'Join Activity'}
-                        </Button>
+                            {actividad.isGoing ? 'Cancelar Asistencia' : 'Unirse a la Actividad'}
+                        </StyledButton>
                     )}
                 </Box>
             </Box>

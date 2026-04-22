@@ -1,15 +1,16 @@
 import { AccessTime, Place } from "@mui/icons-material";
 import { Avatar, Box, Button, Card, CardContent, CardHeader, Chip, Divider, Typography } from "@mui/material";
 import { Link } from "react-router";
+import AvatartPopOver from "../../../app/shared/components/AvatarPopOver";
 
 type Props = {
   actividad: Actividad;
 }
 export default function TarjetaActividad({ actividad }: Props) {
-  const isHost = false;
-  const isGoing = false;
+  const isHost = actividad.isHost;
+  const isGoing = actividad.isGoing;
   const label = isHost ? 'Eres anfitrión' : 'Eres participando';
-  const isCancelled = false;
+  const isCancelled = actividad.isCancelado;
   const color = isHost ? 'secondary' : isGoing ? 'warning' : 'default';
 
   return (
@@ -24,7 +25,7 @@ export default function TarjetaActividad({ actividad }: Props) {
           }}
           subheader={
             <>
-              Hosted by{' '}<Link to={`/profile/bob`}>Bob</Link>
+              Hosted by{' '}<Link to={`/profiles/${actividad.hostId}`}>{actividad.hostDisplayName}</Link>
             </>
           }
         />
@@ -47,7 +48,9 @@ export default function TarjetaActividad({ actividad }: Props) {
         </Box>
         <Divider />
         <Box display='flex' gap={2} sx={{ backgroundColor: 'grey.200', py: 3, pl: 3 }}>
-          Attendees go here
+          {actividad.attendees.map(att => (
+            <AvatartPopOver key={att.id} profile={att} />
+          ))}
         </Box>
       </CardContent>
 

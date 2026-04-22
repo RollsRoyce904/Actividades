@@ -17,7 +17,7 @@ export const router = createBrowserRouter([
         element: <App />,
         children: [
             { path: '', element: <HomePage /> },
-            
+            { path: 'login', element: <LoginForm /> },
             {
                 element: <RequireAuth />, children: [
                     { path: 'actividades', element: <PanelActividad /> },
@@ -31,7 +31,7 @@ export const router = createBrowserRouter([
             { path: 'test-errors', element: <TestErrors /> },
             { path: 'not-found', element: <NoEncontrada /> },
             { path: 'server-error', element: <ServerError /> },
-            { path: 'login', element: <LoginForm /> },
+           
             { path: '*', element: <Navigate replace to='/not-found' /> }
         ]
     }
