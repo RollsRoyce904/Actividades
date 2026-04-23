@@ -28,8 +28,6 @@ namespace API.Controllers
             }
 
             return ValidationProblem();
-            
-            //return HandleResultado(await Mediator.Send(new Register.Command{RegisterDto = registerDto}));
         }
 
         [AllowAnonymous]

@@ -10,6 +10,7 @@ public class User : IdentityUser
 
     //nav prop
     public ICollection<ActividadAttendee> Actividades { get; set; } = [];
-
     public ICollection<Photo> Photos { get; set; } = [];
+    public ICollection<UserFollowing> Followings { get; set; } = [];
+    public ICollection<UserFollowing> Followers { get; set; } = [];
 }

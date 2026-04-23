@@ -10,6 +10,7 @@ import NoEncontrada from "../../features/errors/NoEncontrada";
 import ServerError from "../../features/errors/ServerError";
 import LoginForm from "../../features/account/LoginForm";
 import RequireAuth from "./RequireAuth";
+import PaginaPerfil from "../../features/perfiles/PaginaPerfil";
 
 export const router = createBrowserRouter([
     {
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
                     { path: 'actividades/:id', element: <DetallesActividad /> },
                     { path: 'crearActividad', element: <FormularioActividad key='crear' /> },
                     { path: 'editarActividad/:id', element: <FormularioActividad /> },
+                    { path: 'perfiles/:id', element: <PaginaPerfil /> }
                 ]
             },
             

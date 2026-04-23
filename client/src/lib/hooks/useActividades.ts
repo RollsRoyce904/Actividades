@@ -1,31 +1,50 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
 import { useLocation } from "react-router";
 import { useAccount } from "./useAccount";
+import { useStore } from "./useStore";
 
 export const useActividades = (id?: string) => {
   const queryClient = useQueryClient();
   const { currentUser } = useAccount();
   const location = useLocation();
+  const { activityStore: { filter, startDate } } = useStore();
 
-  const { data: actividades, isLoading } = useQuery({
-    queryKey: ['actividades'],
-    queryFn: async () => {
-      const response = await agent.get<Actividad[]>('/actividades');
+  const { data: actividadesGrupo, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery<PagedList<Actividad, string>>({
+    queryKey: ['actividades', filter, startDate],
+    queryFn: async ({ pageParam = null }) => {
+      const response = await agent.get<PagedList<Actividad, string>>('/actividades', {
+        params: {
+          cursor: pageParam,
+          pageSize: 3,
+          filter,
+          startDate
+        }
+      });
       return response.data;
     },
+    placeholderData: keepPreviousData,
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: !id && location.pathname === '/actividades' && !!currentUser,
-    select: (data) => {
-      return data.map(actividad => {
-        return {
-          ...actividad,
-          isGoing: actividad.attendees.some(a => a.id === currentUser?.id),
-          isHost: currentUser?.id === actividad.hostId
-        }
-      })
-    }
-    //staleTime: 1000 * 60 * 5 // 5 minutos
-  })
+    select: (data) => ({
+      ...data,
+      pages: data.pages.map((page) => ({
+        ...page,
+        items: page.items.map(actividad => {
+          const host = actividad.attendees.find(a => a.id === actividad.hostId);
+          return {
+            ...actividad,
+            isGoing: actividad.attendees.some(a => a.id === currentUser?.id),
+            isHost: currentUser?.id === actividad.hostId,
+            hostImageUrl: host?.imageUrl
+          };
+        }),
+      })),
+    })
+  });
+  //staleTime: 1000 * 60 * 5 // 5 minutos
+
 
   const { data: actividad, isLoading: isLoadingActividad } = useQuery({
     queryKey: ['actividades', id],
@@ -35,10 +54,12 @@ export const useActividades = (id?: string) => {
     },
     enabled: !!id && !!currentUser,
     select: (data) => {
+      const host = data.attendees.find(a => a.id === data.hostId);
       return {
         ...data,
         isGoing: data.attendees.some(a => a.id === currentUser?.id),
-        isHost: currentUser?.id === data.hostId
+        isHost: currentUser?.id === data.hostId,
+        hostImageUrl: host?.imageUrl
       }
     }
   });
@@ -108,7 +129,10 @@ export const useActividades = (id?: string) => {
 
 
   return {
-    actividades,
+    actividadesGrupo,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
     isLoading,
     updateActividad,
     createActividad,

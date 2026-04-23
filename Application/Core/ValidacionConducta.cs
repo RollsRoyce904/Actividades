@@ -18,6 +18,6 @@ public class ValidacionConducta<TRequest, TResponse>(IValidator<TRequest>? valid
             throw new ValidationException(validationResult.Errors);
         }
 
-        return await next();
+        return await next(cancellationToken);
     }
 }

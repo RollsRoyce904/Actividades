@@ -44,7 +44,7 @@ export default function UserMenu() {
                     </ListItemIcon>
                     <ListItemText>Crear actividad</ListItemText>
                 </MenuItem>
-                <MenuItem component={Link} to={`/profiles/${currentUser?.id}`} onClick={handleClose}>
+                <MenuItem component={Link} to={`/perfiles/${currentUser?.id}`} onClick={handleClose}>
                     <ListItemIcon>
                         <Person />
                     </ListItemIcon>

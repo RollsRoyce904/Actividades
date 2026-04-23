@@ -5,17 +5,17 @@ using Application.Actividades.Consultas;
 using Application.Actividades.Comandos;
 using Application.Actividades.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Application.Core;
 
 namespace API.Controllers
 {
-    [ApiController]
     public class ActividadesController : BaseApiController
     {
         [EnableQuery]
         [HttpGet]
-        public async Task<ActionResult<List<ActividadDto>>> GetActividades()
+        public async Task<ActionResult<PagedList<ActividadDto, DateTime?>>> GetActivities([FromQuery]ActividadParams activityParams)
         {
-            return await Mediator.Send(new ListarActividades.Query());
+            return HandleResultado(await Mediator.Send(new ListarActividades.Query(){ Params = activityParams }));
         }
 
         [EnableQuery]

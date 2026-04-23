@@ -17,7 +17,12 @@ export default function TarjetaActividad({ actividad }: Props) {
     <Card elevation={3} sx={{ borderRadius: 3 }}>
 
       <Box display='flex' alignItems='center' justifyContent='space-between'>
-        <CardHeader avatar={<Avatar sx={{ height: 80, width: 80 }} />}
+        <CardHeader 
+        avatar={<Avatar 
+                  src={actividad.hostImageUrl} 
+                  sx={{ height: 80, width: 80 }} 
+                  alt="image of host"
+                  />}
           title={actividad.titulo}
           titleTypographyProps={{
             fontWeight: 'bold',
@@ -25,7 +30,7 @@ export default function TarjetaActividad({ actividad }: Props) {
           }}
           subheader={
             <>
-              Hosted by{' '}<Link to={`/profiles/${actividad.hostId}`}>{actividad.hostDisplayName}</Link>
+              Hosted by{' '}<Link to={`/perfiles/${actividad.hostId}`}>{actividad.hostDisplayName}</Link>
             </>
           }
         />

@@ -37,5 +37,29 @@ namespace API.Controllers
         {
             return HandleResultado(await Mediator.Send(new GetProfile.Query { UserId = userId }));
         }
+
+        [HttpPut]
+        public async Task<ActionResult> UpdateProfile(EditProfile.Command command)
+        {
+            return HandleResultado(await Mediator.Send(command));
+        }
+
+        [HttpGet("{userId}/actividades")]
+        public async Task<ActionResult> GetActividadesForUser(string userId, string filter)
+        {
+            return HandleResultado(await Mediator.Send(new GetUserActividades.Query { UserId = userId, Filter = filter }));
+        }
+
+        [HttpGet("{userId}/follow-list")]
+        public async Task<ActionResult> GetFollowListForUser(string userId, string predicate)
+        {
+            return HandleResultado(await Mediator.Send(new GetUserFollowings.Query { UserId = userId, Predicate = predicate }));
+        }
+
+        [HttpPost("{userId}/follow")]
+        public async Task<IActionResult> Follow(string userId)
+        {
+            return HandleResultado(await Mediator.Send(new FollowToggle.Command{ TargetUserId = userId }));
+        }
     }
 }

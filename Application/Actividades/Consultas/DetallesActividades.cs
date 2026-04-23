@@ -1,6 +1,7 @@
 using System;
 using Application.Actividades.DTO;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain;
@@ -17,12 +18,12 @@ public class DetallesActividades
         public required string Id { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Resultado<ActividadDto>>
+    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Query, Resultado<ActividadDto>>
     {
         public async Task<Resultado<ActividadDto>> Handle(Query request, CancellationToken cancellationToken)
         {
             var actividad = await context.Actividades
-            .ProjectTo<ActividadDto>(mapper.ConfigurationProvider)
+            .ProjectTo<ActividadDto>(mapper.ConfigurationProvider, new { currentUserId = userAccessor.GetUserId() })
             .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (actividad == null) return Resultado<ActividadDto>.Fallido("Actividad no encontrada!", 404);

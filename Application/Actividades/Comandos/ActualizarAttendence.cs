@@ -23,7 +23,7 @@ public class ActualizarAttendence
             var actividad = await context.Actividades
                 .Include(a => a.Attendees)
                 .ThenInclude(u => u.User)
-                .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken);
+                .SingleOrDefaultAsync(a => a.Id == request.Id, cancellationToken);
             
             if (actividad == null) return Resultado<Unit>.Fallido("No se encontró la actividad!", 404);
 

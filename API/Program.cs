@@ -15,6 +15,10 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Application.Interfaces;
 using Infrastructure.Security;
 using Infrastructure.Photos;
+using API.SignalR;
+using Resend;
+using Infrastructure.Email;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -39,12 +43,22 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 });
 
 builder.Services.AddCors();
-
+builder.Services.AddSignalR();
 builder.Services.AddMediatR(x =>
 {
     x.RegisterServicesFromAssemblyContaining<ListarActividades.Handler>();
     x.AddOpenBehavior(typeof(ValidacionConducta<,>));
+    // cfg.LicenseKey = builder.Configuration["Licences:MediatR"];
 });
+
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(opt =>
+{
+    opt.ApiToken = builder.Configuration["Resend:ApiToken"]!;
+});
+builder.Services.AddTransient<IResend, ResendClient>();
+builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
+
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile).Assembly);
@@ -53,6 +67,7 @@ builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddIdentityApiEndpoints<User>(opt =>
 {
     opt.User.RequireUniqueEmail = true;
+    //opt.SignIn.RequireConfirmedEmail = true;
     // opt.Password.RequireDigit = false;
     // opt.Password.RequireLowercase = false;
     // opt.Password.RequireNonAlphanumeric = false;
@@ -69,6 +84,7 @@ builder.Services.AddAuthorization(opt =>
         policy.Requirements.Add(new IsHostRequirement());
     });
 });
+
 builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
@@ -93,12 +109,18 @@ app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 //Provides the routing for the controllers in the API
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<User>(); // api/login, api/register, etc.
+app.MapHub<CommentHub>("/comments"); // SignalR hub for real-time comments
+app.MapFallbackToController("Index", "Fallback");
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
+
 try
 {
     var context = services.GetRequiredService<AppDbContext>();

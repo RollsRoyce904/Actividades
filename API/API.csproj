@@ -20,6 +20,7 @@
   <ItemGroup>
     <Folder Include="DTO\" />
     <Folder Include="Middleware\" />
+    <Folder Include="SignalR\" />
   </ItemGroup>
 
 </Project>

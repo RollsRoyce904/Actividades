@@ -61,6 +61,8 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Date");
+
                     b.ToTable("Actividades");
                 });
 
@@ -83,6 +85,35 @@ namespace Persistence.Migrations
                     b.HasIndex("ActividadId");
 
                     b.ToTable("ActividadAttendees");
+                });
+
+            modelBuilder.Entity("Domain.Comment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ActividadId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActividadId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Domain.Photo", b =>
@@ -181,6 +212,21 @@ namespace Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.UserFollowing", b =>
+                {
+                    b.Property<string>("ObserverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("TargetId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ObserverId", "TargetId");
+
+                    b.HasIndex("TargetId");
+
+                    b.ToTable("UserFollowings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -335,6 +381,25 @@ namespace Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Comment", b =>
+                {
+                    b.HasOne("Domain.Actividad", "Actividad")
+                        .WithMany("Comments")
+                        .HasForeignKey("ActividadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Actividad");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Photo", b =>
                 {
                     b.HasOne("Domain.User", "User")
@@ -344,6 +409,25 @@ namespace Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.UserFollowing", b =>
+                {
+                    b.HasOne("Domain.User", "Observer")
+                        .WithMany("Followings")
+                        .HasForeignKey("ObserverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User", "Target")
+                        .WithMany("Followers")
+                        .HasForeignKey("TargetId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Observer");
+
+                    b.Navigation("Target");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -400,11 +484,17 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Actividad", b =>
                 {
                     b.Navigation("Attendees");
+
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("Domain.User", b =>
                 {
                     b.Navigation("Actividades");
+
+                    b.Navigation("Followers");
+
+                    b.Navigation("Followings");
 
                     b.Navigation("Photos");
                 });
