@@ -46,6 +46,7 @@ builder.Services.AddMediatR(x =>
     x.AddOpenBehavior(typeof(ValidacionConducta<,>));
 });
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<CrearActividadValidador>();
 builder.Services.AddTransient<ExceptionMiddleware>();

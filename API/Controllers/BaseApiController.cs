@@ -16,9 +16,9 @@ namespace API.Controllers
 
         protected ActionResult HandleResultado<T>(Resultado<T> resultado)
         {
-            if (!resultado.EsExitoso) return NotFound(resultado.Error);
+            if (resultado.EsExitoso && resultado.Valor != null) return Ok(resultado.Valor); 
 
-            if (resultado.EsExitoso && resultado.Valor != null) return Ok(resultado.Valor);
+            if (!resultado.EsExitoso && resultado.Code == 404) return NotFound(resultado.Error);
 
             return BadRequest(resultado.Error);       
         }

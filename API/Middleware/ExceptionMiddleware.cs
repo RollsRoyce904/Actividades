@@ -30,7 +30,7 @@ public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, IHostEnvir
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
         var response = env.IsDevelopment()
-            ? new AppException(context.Response.StatusCode, ex.Message, ex.StackTrace)
+            ? new AppException(context.Response.StatusCode, ex.Message, ex.StackTrace?.ToString())
             : new AppException(context.Response.StatusCode, "An error occurred while processing your request.", null);
 
         var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
