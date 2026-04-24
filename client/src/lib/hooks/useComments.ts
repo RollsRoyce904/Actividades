@@ -1,9 +1,13 @@
 import { useLocalObservable } from "mobx-react-lite"
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr"
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { runInAction } from "mobx";
+import { ru } from "zod/v4/locales";
 
 export const useComments = (actividadId?: string) => {
+    const created = useRef(false);
     const commentStore = useLocalObservable(() => ({
+        comments: [] as ChatComment[],
         hubConnection: null as HubConnection | null,
 
         createHubConnection(actividadId: string) {
@@ -18,6 +22,18 @@ export const useComments = (actividadId?: string) => {
                 .build();
 
             this.hubConnection.start().catch(error => console.log("Error establishing connection: ", error));
+
+            this.hubConnection.on("LoadComments", (comments: ChatComment[]) => {
+                runInAction(() => {
+                    this.comments = comments;
+                });
+            });
+
+            this.hubConnection.on("ReceiveComment", (comment: ChatComment) => {
+                runInAction(() => {
+                    this.comments.unshift(comment);
+                });
+            });
         },
         stopHubConnection() {
             if (this.hubConnection?.state === HubConnectionState.Connected) {
@@ -27,11 +43,13 @@ export const useComments = (actividadId?: string) => {
     }));
 
     useEffect(() => {
-        if (actividadId) {
+        if (actividadId && !created.current) {
             commentStore.createHubConnection(actividadId);
+            created.current = true;
         }
         return () => {
             commentStore.stopHubConnection();
+            commentStore.comments = [];
         };
     }, [actividadId, commentStore]);
 

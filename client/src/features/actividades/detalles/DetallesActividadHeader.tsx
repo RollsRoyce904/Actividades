@@ -43,7 +43,7 @@ export default function DetallesActividadHeader({ actividad }: Props) {
                     <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{actividad.titulo}</Typography>
                     <Typography variant="subtitle1">{actividad.date.toString()}</Typography>
                     <Typography variant="subtitle2">
-                        Hosted by <Link to={`/profiles/${actividad.hostId}`} style={{ color: 'white', fontWeight: 'bold' }}>{actividad.hostDisplayName}</Link>
+                        Hosted by <Link to={`/perfiles/${actividad.hostId}`} style={{ color: 'white', fontWeight: 'bold' }}>{actividad.hostDisplayName}</Link>
                     </Typography>
                 </Box>
 
