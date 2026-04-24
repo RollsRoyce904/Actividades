@@ -7,9 +7,8 @@ type Props = {
 }
 
 export default function TarjetaPerfil({ profile }: Props) {
-    const following = false;
     return (
-        <Link to={`/profiles/${profile.id}`} style={{ textDecoration: 'none' }}>
+        <Link to={`/perfiles/${profile.id}`} style={{ textDecoration: 'none' }}>
             <Card elevation={4}
                 sx={{
                     borderRadius: 3,
@@ -40,14 +39,14 @@ export default function TarjetaPerfil({ profile }: Props) {
                             >
                                 {profile?.bio}
                             </Typography>}
-                        {following && 
+                        {profile.following && 
                         <Chip size="small" label='Siguiendo' color='secondary' variant="outlined" />}
                     </Box>
                 </CardContent>
                 <Divider sx={{ mb: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'start' }}>
                     <Person />
-                    <Typography variant="body2" color="textSecondary" sx={{ ml: 1 }}>20 seguidores</Typography>
+                    <Typography variant="body2" color="textSecondary" sx={{ ml: 1 }}>{profile.followersCount} seguidores</Typography>
                 </Box>
             </Card>
         </Link>

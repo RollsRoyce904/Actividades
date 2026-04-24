@@ -6,6 +6,7 @@ using MediatR;
 using Persistence;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper.QueryableExtensions;
+using Application.Interfaces;
 
 namespace Application.Profiles.Consultas;
 
@@ -16,12 +17,12 @@ public class GetProfile
         public required string UserId { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Resultado<UserProfile>>
+    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Query, Resultado<UserProfile>>
     {
         public async Task<Resultado<UserProfile>> Handle(Query request, CancellationToken cancellationToken)
         {
             var profile = await context.Users
-                .ProjectTo<UserProfile>(mapper.ConfigurationProvider)
+                .ProjectTo<UserProfile>(mapper.ConfigurationProvider, new { currentUserId = userAccessor.GetUserId() })
                 .SingleOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
             return profile == null
