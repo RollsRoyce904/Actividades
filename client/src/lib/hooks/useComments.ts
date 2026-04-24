@@ -2,7 +2,6 @@ import { useLocalObservable } from "mobx-react-lite"
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr"
 import { useEffect, useRef } from "react";
 import { runInAction } from "mobx";
-import { ru } from "zod/v4/locales";
 
 export const useComments = (actividadId?: string) => {
     const created = useRef(false);
