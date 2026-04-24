@@ -11,11 +11,10 @@ namespace API.Controllers
 {
     public class ActividadesController : BaseApiController
     {
-        [EnableQuery]
         [HttpGet]
         public async Task<ActionResult<PagedList<ActividadDto, DateTime?>>> GetActivities([FromQuery]ActividadParams activityParams)
         {
-            return HandleResultado(await Mediator.Send(new ListarActividades.Query(){ Params = activityParams }));
+            return HandleResultado(await Mediator.Send(new ListarActividades.Query() { Params = activityParams }));
         }
 
         [EnableQuery]
