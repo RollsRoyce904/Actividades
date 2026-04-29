@@ -1,6 +1,7 @@
 using Application.Core;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace API.Controllers
@@ -14,6 +15,7 @@ namespace API.Controllers
         protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>()
             ?? throw new InvalidOperationException("Servicio IMediatr no disponible!");
 
+        [EnableQuery]
         protected ActionResult HandleResultado<T>(Resultado<T> resultado)
         {
             if (resultado.EsExitoso && resultado.Valor != null) return Ok(resultado.Valor); 

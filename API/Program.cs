@@ -27,14 +27,10 @@ builder.Services.AddControllers(opt =>
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
 })
-.AddOData(opt => 
-    opt.AddRouteComponents("odata", GetEdmModel())
-    .Select()
-    .Filter()
-    .OrderBy()
-    .Expand()
-    .SetMaxTop(100)
-    .Count()
+.AddOData(odataOpts => 
+    odataOpts.EnableQueryFeatures(100)
+    .AddRouteComponents("api",GetEdmModel())
+    .Select().Filter().OrderBy().Expand().SetMaxTop(100).Count()
     );
     
 builder.Services.AddDbContext<AppDbContext>(opt => 
