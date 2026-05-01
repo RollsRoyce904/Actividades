@@ -1,7 +1,6 @@
-import {Box, debounce, List, ListItemButton, TextField, Typography} from "@mui/material";
+import {Box, List, ListItemButton, TextField, Typography} from "@mui/material";
 import { type FieldValues, useController, type UseControllerProps } from "react-hook-form";
-import {useEffect, useMemo, useState} from "react";
-import axios from "axios";
+import { useMap } from "../../../lib/hooks/useMap";
 
 type Props<T extends FieldValues> = {
     label: string
@@ -9,55 +8,10 @@ type Props<T extends FieldValues> = {
 
 export default function LocationInput<T extends FieldValues>(props: Props<T>) {
     const { fieldState, field } = useController({ ...props });
-    const [loading, setLoading] = useState(false);
-    const [suggestions, setSuggestions] = useState<LocationIQSuggestion[]>([]);
-    const [inputValue, setInputValue] = useState(field.value || '');
-
-    useEffect(() => {
-        if (field.value && typeof field.value === 'object') {
-            setInputValue(field.value.lugar || '');
-        } else {
-            setInputValue(field.value || '');
-        }
-    }, [field.value]);
-
-    const locationUrl = `https://api.locationiq.com/v1/autocomplete?key=${import.meta.env.VITE_LOCATIONIQ_API_KEY}&limit=5&dedupe=1&`;
-
-    const fetchSuggestions = useMemo(
-        () => debounce(async (query: string) => {
-            if (!query || query.length < 3) {
-                setSuggestions([]);
-                return;
-            }
-
-            setLoading(true);
-
-            try {
-                const res = await axios.get<LocationIQSuggestion[]>(`${locationUrl}q=${query}`);
-                setSuggestions(res.data);
-            } catch (e) {
-                console.error('Error fetching suggestions:', e);
-            } finally {
-                setLoading(false);
-            }
-        }, 500),
-        [locationUrl]
-    );
-
-    const handleChange = async (value: string) => {
-        field.onChange(value);
-        await fetchSuggestions(value);
-    }
-
-    const handleSelect = (location: LocationIQSuggestion) => {
-        const ciudad = location.address?.city || location.address?.village || location.address?.town;
-        const lugar = location.display_name;
-        const latitud = Number(location.lat);
-        const longitud = Number(location.lon);
-        setInputValue(lugar);
-        field.onChange({ ciudad, lugar, latitud, longitud });
-        setSuggestions([]);
-    }
+    const { loading, suggestions, inputValue, handleChange, handleSelect } = useMap({
+        value: field.value,
+        onChange: field.onChange,
+    });
 
     return (
         <Box>

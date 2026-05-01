@@ -3,7 +3,6 @@ using Persistence;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.Edm;
 using Domain;
-using Microsoft.AspNetCore.OData;
 using Application.Actividades.Consultas;
 using Application.Core;
 using FluentValidation;
@@ -26,12 +25,7 @@ builder.Services.AddControllers(opt =>
 {
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
-})
-.AddOData(odataOpts => 
-    odataOpts.EnableQueryFeatures(100)
-    .AddRouteComponents("api",GetEdmModel())
-    .Select().Filter().OrderBy().Expand().SetMaxTop(100).Count()
-    );
+});
     
 builder.Services.AddDbContext<AppDbContext>(opt => 
 {
@@ -46,7 +40,7 @@ builder.Services.AddMediatR(x =>
     x.AddOpenBehavior(typeof(ValidacionConducta<,>));
     // cfg.LicenseKey = builder.Configuration["Licences:MediatR"];
 });
-
+var locationIqApiKey = builder.Configuration["LocationIQ:ApiKey"];
 builder.Services.AddHttpClient<ResendClient>();
 builder.Services.Configure<ResendClientOptions>(opt =>
 {
@@ -86,7 +80,7 @@ builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
@@ -95,10 +89,10 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
 .WithOrigins("http://localhost:3000", "https://localhost:3000"));
 
-// if (app.Environment.IsDevelopment())
-// {
-//     app.MapOpenApi();
-// }
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
 
 //app.UseHttpsRedirection();
 
@@ -131,10 +125,3 @@ catch (Exception ex)
 }
 
 app.Run();
-
-static IEdmModel GetEdmModel()
-{
-    var builder = new ODataConventionModelBuilder();
-    builder.EntitySet<Actividad>("actividades"); // "Actividades" is the URL segment
-    return builder.GetEdmModel();
-}
